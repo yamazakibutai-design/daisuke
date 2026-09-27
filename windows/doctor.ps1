@@ -105,6 +105,11 @@ foreach ($g in $gpus) {
 if (Get-Command nvidia-smi -ErrorAction SilentlyContinue) {
     $smi = (& nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader 2>&1) -join ''
     Add-Row 'gpu' 'nvidia-smi' $true $smi ''
+    # ffmpeg 9.x の NVENC は API 13.1 = ドライバ 610 以上が要る（実機 591.97 で "Driver does not support" になった）
+    $drv = [double](($smi -split ',')[-1].Trim() -replace '[^0-9.]', '')
+    if ($drv -gt 0) {
+        Add-Row 'gpu' 'NVIDIA driver >= 610 (NVENC)' ($drv -ge 610) "driver $drv" 'NVIDIA App > ドライバー > エクスプレスインストール'
+    }
 }
 
 # ---------------------------------------------------------------- WSL

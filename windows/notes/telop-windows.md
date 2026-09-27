@@ -33,6 +33,12 @@
 drawtext は CPU フィルタなので、`-hwaccel_output_format cuda` は付けない（付けると drawtext に渡せず落ちる）。
 ビットレート・`-g 60 -keyint_min 60 -sc_threshold 0 -pix_fmt yuv420p -video_track_timescale 30000` は VM 時代の値をそのまま踏襲する（2.06GB／62 分に着地した実測）。
 
+## NVENC が「Driver does not support the required nvenc API version」で落ちるとき
+
+ffmpeg 9.x の NVENC は NVIDIA ドライバ **610 以上**（API 13.1）が要る。実機は 591.97 で落ちた。
+NVIDIA App → ドライバー → エクスプレスインストール で更新すれば直る。`doctor.ps1` の `NVIDIA driver >= 610` 行で確認できる。
+更新できないときは `libx264 -preset veryfast -crf 21` に落とす（VM と同じ速度感だが、制限が無いぶん実時間はそれより短い）。
+
 ## drawtext のフォント指定（Windows で一番ハマる所）
 
 `fontfile=` に Windows パスを渡すときは **コロンをエスケープ・区切りはスラッシュ**。
