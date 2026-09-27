@@ -23,7 +23,7 @@
 [CmdletBinding()]
 param(
     [switch]$Force,
-    [string[]]$Keys = @('OPENAI_API_KEY', 'GOOGLE_API_KEY', 'GEMINI_API_KEY', 'ANTHROPIC_API_KEY')
+    [string[]]$Keys = @('GEMINI_API_KEY', 'GOOGLE_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY')
 )
 
 Set-StrictMode -Version Latest
