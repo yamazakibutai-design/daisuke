@@ -192,28 +192,27 @@ foreach ($group in $targets) {
 # ---------------------------------------------------------------- Claude Code
 
 if (($targets -contains 'core') -and -not $DryRun) {
-    Write-Step 'Claude Code CLI'
-    # winget で入れた Node は、このセッションの PATH にまだ載っていないことがある
-    $npm = Get-Command npm -ErrorAction SilentlyContinue
-    if (-not $npm) {
-        $guess = Join-Path $env:ProgramFiles 'nodejs\npm.cmd'
-        if (Test-Path $guess) { $npm = $guess } 
+    Write-Step 'Claude Code CLI（公式ネイティブインストーラー。npm は使わない）'
+    # 実機で npm 経由は "npm error code 1" で落ち、しかも $ErrorActionPreference=Stop だと
+    # stderr の 1 行で NativeCommandError になりスクリプトごと止まった。
+    # 公式の install.ps1 は Node に依存せず %USERPROFILE%\.local\bin に claude.exe を置く。
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        Invoke-RestMethod -Uri 'https://claude.ai/install.ps1' -UseBasicParsing | Invoke-Expression
+    } catch {
+        Write-Warn2 "インストーラーの実行でエラー: $($_.Exception.Message)"
     }
-    if ($npm) {
-        & $(if ($npm -is [string]) { $npm } else { $npm.Source }) install -g '@anthropic-ai/claude-code' 2>&1 |
-            ForEach-Object { Write-Host "       $_" -ForegroundColor DarkGray }
-        if ($LASTEXITCODE -eq 0) {
-            Write-Ok 'claude コマンド導入完了'
-            $script:Installed.Add('Claude Code CLI')
-        } else {
-            Write-Warn2 'npm での導入に失敗。ターミナルを開き直して再実行してください:'
-            Write-Host '       npm install -g @anthropic-ai/claude-code'
-            $script:Failed.Add('Claude Code CLI')
-        }
+    $ErrorActionPreference = $prevEap
+
+    $claudeExe = Join-Path $env:USERPROFILE '.local\bin\claude.exe'
+    if ((Test-Path $claudeExe) -or (Get-Command claude -ErrorAction SilentlyContinue)) {
+        Write-Ok 'claude コマンド導入完了（新しいターミナルで claude --version）'
+        $script:Installed.Add('Claude Code CLI')
     } else {
-        Write-Warn2 'npm が PATH に載っていません。ターミナルを開き直してから次を実行:'
-        Write-Host '       npm install -g @anthropic-ai/claude-code'
-        $script:Failed.Add('Claude Code CLI (npm 未検出)')
+        Write-Warn2 '導入を確認できません。ターミナルを開き直して次を実行してください:'
+        Write-Host '       irm https://claude.ai/install.ps1 | iex'
+        $script:Failed.Add('Claude Code CLI')
     }
 }
 

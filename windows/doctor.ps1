@@ -32,7 +32,7 @@ function Test-Cmd {
 $null = Test-Cmd 'core' 'git'    'git'    -Fix '.\00_bootstrap.ps1'
 $null = Test-Cmd 'core' 'node'   'node'   -Fix '.\00_bootstrap.ps1'
 $null = Test-Cmd 'core' 'npm'    'npm'    -Fix 'ターミナルを開き直す'
-$null = Test-Cmd 'core' 'claude' 'claude' -Fix 'npm install -g @anthropic-ai/claude-code'
+$null = Test-Cmd 'core' 'claude' 'claude' -Fix 'irm https://claude.ai/install.ps1 | iex'
 $null = Test-Cmd 'core' 'uv'     'uv'     -Fix '.\00_bootstrap.ps1'
 $null = Test-Cmd 'core' 'pwsh (PowerShell 7)' 'pwsh' -Fix 'winget install Microsoft.PowerShell'
 
