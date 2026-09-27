@@ -72,7 +72,8 @@ function New-Venv {
     }
 
     $python = Join-Path $path 'Scripts\python.exe'
-    $ver = & $python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")'
+    # PS 5.1 は exe へ渡す引数内の " を剥がすので、python -c には引用符を使わない
+    $ver = ((& $python -c 'import sys;print(str(sys.version_info[0])+chr(46)+str(sys.version_info[1]))' 2>&1) -join '').Trim()
     if ($ver -ne $PythonVersion) {
         Write-Err2 "この venv の Python は $ver です。$PythonVersion が必要。-Recreate で作り直してください。"
         return $false

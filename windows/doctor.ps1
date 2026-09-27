@@ -43,10 +43,11 @@ foreach ($v in @(
 )) {
     $py = Join-Path $env:USERPROFILE ".venvs\$($v.Name)\Scripts\python.exe"
     if (-not (Test-Path $py)) { Add-Row 'python' "venv $($v.Name)" $false '無い' '.\01_python.ps1'; continue }
-    $ver = & $py -c 'import sys;print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>&1
+    $ver = ((& $py -c 'import sys;print(str(sys.version_info[0])+chr(46)+str(sys.version_info[1]))' 2>&1) -join '').Trim()
     Add-Row 'python' "venv $($v.Name) = Python $ver" ($ver -eq $v.Want) '' $(if ($ver -ne $v.Want) { '.\01_python.ps1 -Recreate' })
-    $code = "import importlib.util,sys`nbad=[m for m in '$($v.Modules)'.split(',') if importlib.util.find_spec(m) is None]`nprint(','.join(bad))"
-    $bad = (& $py -c $code 2>&1) -join ''
+    # 引用符を使わず 1 行で（PS 5.1 の引数 " 剥がし対策）。モジュール名は argv で渡す
+    $code = 'import importlib.util,sys;print(chr(44).join(m for m in sys.argv[1].split(chr(44)) if importlib.util.find_spec(m) is None))'
+    $bad = ((& $py -c $code $v.Modules 2>&1) -join '').Trim()
     Add-Row 'python' "venv $($v.Name) modules" ([string]::IsNullOrWhiteSpace($bad)) $(if ($bad) { "missing: $bad" } else { $v.Modules }) $(if ($bad) { '.\01_python.ps1' })
     $utf = & $py -c 'import sys;print(sys.flags.utf8_mode)' 2>&1
     Add-Row 'python' "venv $($v.Name) UTF-8 mode" ("$utf" -eq '1') "utf8_mode=$utf" $(if ("$utf" -ne '1') { '.\03_workspace.ps1 の後、ターミナルを開き直す' })
