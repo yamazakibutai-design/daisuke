@@ -90,6 +90,15 @@ Add-Row 'creative' 'Claude Desktop (Cowork)' $claudeDesktopOk '' 'winget install
 # 画像生成は Gemini キー 1 本で動く（bolero-senden の仕様）。OpenAI は任意
 $gem = [Environment]::GetEnvironmentVariable('GEMINI_API_KEY', 'User')
 Add-Row 'secrets' 'GEMINI_API_KEY' (-not [string]::IsNullOrWhiteSpace($gem)) $(if ($gem) { "$($gem.Length) 文字" } else { '未設定（画像生成に必要）' }) '.\04_secrets.ps1'
+# キーが実際に通るか（モデル一覧を 1 回取る。課金なし）
+if ($gem) {
+    try {
+        $r = Invoke-RestMethod -Uri "https://generativelanguage.googleapis.com/v1beta/models?key=$gem&pageSize=1" -TimeoutSec 15 -UseBasicParsing
+        Add-Row 'secrets' 'Gemini API 接続' ($null -ne $r.models) '接続 OK（モデル一覧取得）' ''
+    } catch {
+        Add-Row 'secrets' 'Gemini API 接続' $false "失敗: $($_.Exception.Message)" 'キーが無効か期限切れ。AI Studio で再発行 → .\04_secrets.ps1 -Force'
+    }
+}
 $oai = [Environment]::GetEnvironmentVariable('OPENAI_API_KEY', 'User')
 Add-Row 'secrets' 'OPENAI_API_KEY (任意)' $true $(if ($oai) { "$($oai.Length) 文字" } else { '未設定（Gemini があれば不要）' }) ''
 Add-Row 'creative' 'DaVinci Resolve' (Test-Path "$env:ProgramFiles\Blackmagic Design\DaVinci Resolve\Resolve.exe") '' '任意: blackmagicdesign.com から'
@@ -125,11 +134,22 @@ if (Get-Command nvidia-smi -ErrorAction SilentlyContinue) {
     }
 }
 
+# ---------------------------------------------------------------- Mac 超え（05〜08）
+$wpy = [Environment]::GetEnvironmentVariable('YBJ_VENV_WHISPER', 'User')
+Add-Row 'plus' 'Whisper 文字起こし (GPU)' ([bool]$wpy -and (Test-Path "$wpy")) $(if ($wpy) { [Environment]::GetEnvironmentVariable('YBJ_WHISPER_MODEL', 'User') } else { '未導入（任意）' }) '.\06_whisper.ps1'
+$cf = [Environment]::GetEnvironmentVariable('YBJ_COMFY', 'User')
+Add-Row 'plus' 'ComfyUI 画像生成 (GPU)' ([bool]$cf -and (Test-Path "$cf\ComfyUI_windows_portable\run_nvidia_gpu.bat")) $(if ($cf) { "$cf" } else { '未導入（任意）' }) '.\07_comfyui.ps1'
+Add-Row 'plus' '夜間バッチ (Task Scheduler)' ((Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object TaskName -like 'YBJ-*' | Measure-Object).Count -gt 0) '' '.\08_scheduler.ps1 -Register <job>'
+
 # ---------------------------------------------------------------- WSL
 # wsl.exe は UTF-16 で出力するので、取り込むと NUL が混ざる。落としてから見る
 $wslOut = ((& wsl -l -v 2>&1) -join ' ') -replace "`0", ''
 $wslOk = $wslOut -match 'Ubuntu'
-Add-Row 'wsl' 'WSL2 Ubuntu (保険)' $wslOk $(if ($wslOk) { '入っている' } else { '未導入（任意）' }) '管理者で wsl --install -d Ubuntu'
+Add-Row 'wsl' 'WSL2 Ubuntu' $wslOk $(if ($wslOk) { '入っている' } else { '未導入（帳票を Windows で回すなら必要）' }) '.\05_wsl.ps1 -Stage A（管理者）'
+if ($wslOk) {
+    $lo = ((& wsl -e bash -lc 'soffice --version 2>/dev/null | head -1; test -x ~/.venvs/ybj/bin/python && echo VENV_OK' 2>&1) -join ' ') -replace "`0", ''
+    Add-Row 'wsl' 'WSL: LibreOffice + venv（帳票）' ($lo -match 'LibreOffice' -and $lo -match 'VENV_OK') $lo '.\05_wsl.ps1 -Stage B'
+}
 
 # ---------------------------------------------------------------- 出力
 $rows | Format-Table -AutoSize -Wrap Area, Status, Item, Detail, Fix | Out-String -Width 200 | Write-Host

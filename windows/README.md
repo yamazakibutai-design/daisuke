@@ -10,7 +10,11 @@ windows/
 ├─ 02_fonts.ps1         Noto Sans CJK（ユーザー単位）＋ matplotlibrc ＋ ffmpeg 用フォントパス
 ├─ 03_workspace.ps1     C:\YBJ 作業フォルダ・環境変数・git/PowerShell の UTF-8 化・CLAUDE.md 配置
 ├─ 04_secrets.ps1       API キー（OpenAI / Google 等）をユーザー環境変数に登録（対話式・値を残さない）
-├─ doctor.ps1           全部入ったか検証（GPU / NVENC の有無も出す）
+├─ 05_wsl.ps1 + wsl/    WSL2 + LibreOffice → 帳票スキルも Windows で回せる（Mac 専用が無くなる）
+├─ 06_whisper.ps1       ローカル文字起こし（Whisper・CUDA 12.8）＋ ybj-whisper.ps1
+├─ 07_comfyui.ps1 + comfy/  ローカル画像生成（ComfyUI・SDXL）＋ API クライアント
+├─ 08_scheduler.ps1     夜間バッチ（Task Scheduler → claude -p）
+├─ doctor.ps1           全部入ったか検証（GPU / NVENC / Gemini API 接続 / 05〜08 も出す）
 ├─ CLAUDE.windows.md    Windows 機の Claude Code ルール（03 が ~/.claude/CLAUDE.md に配置）
 ├─ requirements-general.txt / requirements-bpy311.txt
 └─ notes/
@@ -99,6 +103,17 @@ cd "$env:USERPROFILE\daisuke\windows"
 | Python | VM 内。`--break-system-packages` | venv 2 系統。UTF-8 固定 |
 | 日本語フォント | Noto CJK | Noto CJK ＋ Yu Gothic |
 | 帳票 PDF 化 | ○ | △ AF_UNIX 問題 → Mac 担当のまま、または WSL2（`notes/compat.md`） |
+
+## Mac 超え（05〜08）
+
+| # | スクリプト | 何が増えるか | 所要 |
+|---|---|---|---|
+| 1 | `05_wsl.ps1 -Stage A`（管理者）→ 再起動 → `-Stage B` | 帳票スキル（estimate / invoice …）も Windows で回る。Mac にしかできない仕事がゼロに | 20 分 |
+| 2 | `06_whisper.ps1` | 1 時間の音声を数分で文字起こし（GPU・API 代ゼロ） | 15 分（torch 3GB） |
+| 3 | `07_comfyui.ps1` | パース案をローカルで無制限生成。Gemini API は仕上げに併用 | 30 分（モデル 7GB） |
+| 4 | `08_scheduler.ps1` | `C:\YBJ\_jobs\*.md` に書いた仕事を夜中に Claude Code が無人で実行 | 5 分 |
+
+RTX 50 系（Blackwell）は **CUDA 12.8 以降**が必須。06 は torch cu128、07 は cu128 以降同梱のポータブル版を使う。
 
 ## 困ったとき
 

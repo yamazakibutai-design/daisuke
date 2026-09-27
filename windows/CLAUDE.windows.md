@@ -10,9 +10,11 @@ Windows 機で Claude Code を使うときの前提を書いてある。Mac 側�
 | **この Windows 機** | クリエイティブ／テクニカル | zumen-3d-previz / riha-douga-telop / butai-perspective / intercom-zu / foh-takuhaichi / enshutsu-sheet / kaigai-stage-rider / bolero-senden（画像・動画生成） |
 | **Mac** | 庶務雑務 | estimate / invoice / ybj-juchusho / arari-shisan / dashin-kanri / boshu-anken / jizen-seisan-annai / getsumatsu-shiharai-annai / bolero-juchu / Gmail 下書き・Chrome 自動化 全般 |
 
-- 帳票・メール系を頼まれたら、まず「それは Mac 側の担当」と一言返す。それでもここでやる場合は WSL2 で回す
-  （理由: xlsx / docx / pptx スキルの `office/soffice.py` が `socket.AF_UNIX` を参照し、
-  Windows の Python では `AttributeError` で止まる。`daisuke/windows/notes/compat.md` 参照）。
+- 帳票・メール系は原則 Mac 担当。ただし **WSL2 が入っていればここでも回せる**（`wsl -l -q` に Ubuntu があれば可）:
+  `wsl -e bash -lc 'source ~/.venvs/ybj/bin/activate && cd /mnt/c/YBJ && python3 <script>'`
+  - Windows の Python で直接回さない（xlsx/docx/pptx の `office/soffice.py` が `socket.AF_UNIX` で落ちる）
+  - 台帳（`estimates_2026.xlsx` 等）は Mac の Drive ミラー上にある。Windows から書くのは **Mac 側で同じファイルを開いていないとき**だけ。書く前にユーザーに一言確認する
+  - Gmail 下書きは MCP（claude.ai コネクタ）経由で作れる。Chrome ポップアップの手順は Windows の Chrome で同じ
 - 逆に 3D・図面・パース・映像・音響は Mac の Linux VM より **この機のほうが速い**（GPU がある）。遠慮なく使う。
 
 ## パス規約
@@ -61,6 +63,19 @@ Windows 機で Claude Code を使うときの前提を書いてある。Mac 側�
 - wheel が入らないときは `blender.exe -b --python build.py` で同じスクリプトが動く（API 同一）。
 - FBX → Unreal Engine。単位は m（Blender）→ cm（UE）の変換に注意。
 - 詳細: `daisuke/windows/notes/previz-windows.md`
+
+## Mac にできないこと（この機の強み。積極的に使う）
+
+| 機能 | 呼び方 | 出力先 |
+|---|---|---|
+| **文字起こし**（Whisper・GPU） | `pwsh -File %USERPROFILE%\daisuke\windows\ybj-whisper.ps1 "<音声/動画>"` | `C:\YBJ\音源\文字起こし\<名前>\`（txt / srt / json） |
+| **ローカル画像生成**（ComfyUI・GPU） | サーバー `pwsh -File %YBJ_COMFY%\start-comfy.ps1` を起動しておき、`"$YBJ_VENV" %YBJ_COMFY%\comfy_generate.py --prompt "..." --n 4 --out C:\YBJ\パース\x.png` | `C:\YBJ\パース\` |
+| **API 画像生成**（Gemini / Imagen） | `GEMINI_API_KEY` 登録済み。butai-perspective / bolero-senden のスクリプトがそのまま使う | スキルの規定どおり |
+| **夜間バッチ** | `C:\YBJ\_jobs\<名前>.md` に日本語で書き、`08_scheduler.ps1 -Register <名前> -At 03:00` | `C:\YBJ\_logs\` |
+
+- パースは「まず ComfyUI で構図案を量産 → 良いものを Gemini/Imagen で仕上げ」の 2 段が速くて安い。
+- 文字起こしはリハ音声の譜割時刻取り・MC 把握・会議録に使う。1 時間の音声で数分。
+- 長いレンダー・書き出しは夜間バッチに回す提案をする（PC はスリープさせない）。
 
 ## 報告のしかた
 
