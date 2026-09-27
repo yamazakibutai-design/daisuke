@@ -75,7 +75,8 @@ $epicPaths = @(
     "$env:ProgramFiles\Epic Games\Launcher\Portal\Binaries\Win64\EpicGamesLauncher.exe"
 )
 $epicReg = Get-ItemProperty 'HKLM:\SOFTWARE\WOW6432Node\Epic Games\EpicGamesLauncher' -ErrorAction SilentlyContinue
-$epicOk = ($epicPaths | Where-Object { Test-Path $_ }).Count -gt 0 -or ($null -ne $epicReg)
+# StrictMode では単一要素/空の結果に .Count が無いので @() で配列化する（実機で PropertyNotFoundStrict）
+$epicOk = (@($epicPaths | Where-Object { Test-Path $_ }).Count -gt 0) -or ($null -ne $epicReg)
 Add-Row 'creative' 'Epic Games Launcher' $epicOk '' 'winget install EpicGames.EpicGamesLauncher'
 $ue = Get-ChildItem "$env:ProgramFiles\Epic Games" -Directory -Filter 'UE_*' -ErrorAction SilentlyContinue | Select-Object -First 1
 Add-Row 'creative' 'Unreal Engine' ($null -ne $ue) $(if ($ue) { $ue.Name } else { '未導入（任意）' }) 'Epic Games Launcher から UE 5.x を導入'
