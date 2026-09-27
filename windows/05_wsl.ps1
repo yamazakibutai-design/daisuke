@@ -72,9 +72,11 @@ Write-Host '  sudo のパスワードを聞かれたら、Ubuntu で決めたパ
 if ($LASTEXITCODE -ne 0) { Write-Err2 "wsl-setup.sh が失敗（終了コード $LASTEXITCODE）"; exit 1 }
 
 Write-Step '検証'
-$v = (& wsl -e bash -lc 'soffice --version 2>/dev/null | head -1; ~/.venvs/ybj/bin/python -c "import socket,openpyxl,reportlab;socket.socket(socket.AF_UNIX);print(\"AF_UNIX ok / openpyxl\",openpyxl.__version__)"' 2>&1) -join "`n"
+# 引用符を PowerShell → bash に渡すと PS 5.1 で崩れるので、検証もファイルで渡す
+$chk = (& wsl wslpath -a ((Join-Path $here 'wsl\wsl-check.sh') -replace '\\', '/')) -join ''
+$v = (& wsl -e bash -lc "bash '$chk'" 2>&1) -join "`n"
 Write-Host $v
-if ($v -match 'LibreOffice' -and $v -match 'AF_UNIX ok') {
+if ($v -match 'WSL_CHECK_OK') {
     Write-Ok 'WSL 側で帳票スキルが動く状態です'
     Write-Host @'
 
