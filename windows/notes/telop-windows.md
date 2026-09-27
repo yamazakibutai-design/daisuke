@@ -13,7 +13,7 @@
 | 削除 | `rm` 不可 | 可（確認してから） |
 | HEVC Main10 デコード | ソフト。実時間の 1.2 倍 | GPU（`-hwaccel cuda` など） |
 | H.264 エンコード | `libx264 veryfast` | `h264_nvenc`（無ければ libx264） |
-| 62 分素材の書き出し | 40〜50 分 | **目安 6〜15 分**（GPU 次第。着手前に `doctor.ps1` の結果で見積もる） |
+| 62 分素材の書き出し | 40〜50 分 | **約 5 分**（実測: RTX 5070 Ti Laptop、cuda デコード→h264_nvenc で実時間の 13 倍速。2026-09-27） |
 | 書き出し方 | 30 秒セグメント＋レジューム | **曲ごとに 1 本** → concat |
 | 素材の場所 | `/Volumes/PortableSSD/...` | `D:\HKTRH\前\...`（外付け SSD のレター） |
 | フォント | `/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc` | `%YBJ_TELOP_FONT%`（Noto か YuGothB） |
@@ -111,5 +111,5 @@ SendUserFile の 30MB 制限は Claude Code でも同じ。55 秒・2500kbps に
 
 ## 所要時間の見積もり（着手前に伝える）
 
-`doctor.ps1` で NVENC が OK なら「62 分素材で 10 分前後」、無ければ「libx264 で 30〜40 分（VM よりは速い）」と伝える。
+`doctor.ps1` で NVENC が OK なら「62 分素材で 5 分前後」（RTX 5070 Ti 実測 13 倍速）、無ければ「libx264 で 30〜40 分（VM よりは速い）」と伝える。
 初回は 1 曲だけ書いて実測し、`(実測秒 / 曲の長さ) × 合計` で言い直す。

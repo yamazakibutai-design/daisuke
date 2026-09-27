@@ -65,7 +65,7 @@ cd "$env:USERPROFILE\daisuke\windows"
 
 | アプリ | やること |
 |---|---|
-| **Claude Code** | `claude` を実行してログイン。Mac と同じアカウントなら synced スキル（zumen-3d-previz 等）が自動で降りてくる。降りてこなければ Mac の `~/.claude/skills/` を Drive 経由でコピー |
+| **Claude Code** | `claude` を実行してログイン（Windows 機で実施済み）。Mac と同じアカウントなら synced スキル（zumen-3d-previz 等）が自動で降りてくる。降りてこなければ Mac の `~/.claude/skills/` を Drive 経由でコピー |
 | **Google Drive** | サインイン → **「ファイルをストリーミング」** を選ぶ（ミラーしない）。G: に「マイドライブ」が出れば OK |
 | **Obsidian** | 「保管庫を開く」で `G:\マイドライブ\…\<Mac の保管庫>` を指定 |
 | **Blender** | 一度起動して 4.2 LTS であることを確認（bpy と版を揃える） |
@@ -88,7 +88,7 @@ cd "$env:USERPROFILE\daisuke\windows"
 
 | | Mac（Cowork の Linux VM） | Windows |
 |---|---|---|
-| リハ映像 62 分の書き出し | 40〜50 分（ソフトデコード、120 秒制限でセグメント分割） | GPU なら 10 分前後。制限なし、1 本書き |
+| リハ映像 62 分の書き出し | 40〜50 分（ソフトデコード、120 秒制限でセグメント分割） | 約 5 分（RTX 5070 Ti 実測 13 倍速）。制限なし、1 本書き |
 | Blender レンダー | CPU | GPU（Cycles OptiX / Eevee） |
 | Unreal Engine | 無し | ネイティブ |
 | DaVinci Resolve | 無し（MCP 経由のみ） | ネイティブ |
