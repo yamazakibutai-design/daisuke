@@ -35,6 +35,25 @@ export PYTHONUTF8=1
 EOF
 ok "YBJ_HOME=~/Desktop/YBJ / YBJ_VENV / PYTHONUTF8"
 
+step "Windows と同じカスタマイズ（フォルダ / matplotlib / git / CLAUDE.md / 文字起こし）"
+REPO="$HOME/daisuke"; [ -d "$REPO/.git" ] || git clone -q -b claude/awesome-turing-hw3g4d https://github.com/yamazakibutai-design/daisuke.git "$REPO"
+git -C "$REPO" pull -q 2>/dev/null || true
+for d in "3D/ブレンダ" 図面 パース 演出シート リハ映像 音源/文字起こし 音響 ClaudeOutput _中間ファイル_削除可 _to_windows; do mkdir -p "$HOME/Desktop/YBJ/$d"; done
+mkdir -p ~/.matplotlib; cat > ~/.matplotlib/matplotlibrc <<'EOF2'
+font.family        : sans-serif
+font.sans-serif    : Noto Sans CJK JP, Hiragino Sans, Hiragino Kaku Gothic ProN, DejaVu Sans
+axes.unicode_minus : False
+pdf.fonttype       : 42
+ps.fonttype        : 42
+EOF2
+git config --global core.quotepath false; git config --global core.autocrlf false
+mkdir -p ~/.claude
+if [ -f ~/.claude/CLAUDE.md ] && ! grep -q 'YBJ Mac 機ルール' ~/.claude/CLAUDE.md; then printf '\n\n' >> ~/.claude/CLAUDE.md; cat "$REPO/mac/CLAUDE.mac.md" >> ~/.claude/CLAUDE.md; else cp "$REPO/mac/CLAUDE.mac.md" ~/.claude/CLAUDE.md; fi
+ok "~/.claude/CLAUDE.md（Mac 版ルール）"
+uv pip install --python ~/.venvs/ybj/bin/python -q mlx-whisper && ok "mlx-whisper（文字起こし・Apple Silicon）" || warn "mlx-whisper は Apple Silicon 専用"
+chmod +x "$REPO"/mac/*.sh; ok "$REPO/mac/{whisper,secrets,doctor}.sh"
+cp "$REPO"/windows/SETUP_*.md "$HOME/Desktop/YBJ/README_Windows.md" 2>/dev/null && ok "~/Desktop/YBJ/README_Windows.md"
+
 step "API キー"
 [ -f ~/.bolero-senden.env ] && ok "~/.bolero-senden.env あり" || warn "~/.bolero-senden.env が無い（GEMINI_API_KEY=... を 1 行書く）"
 
@@ -45,7 +64,8 @@ fc-list 2>/dev/null | grep -qi 'Noto Sans CJK' && ok "Noto CJK" || warn "Noto CJ
 
 cat <<'EOF'
 
-完了。あとは手作業 3 つ:
+完了。健康診断: bash ~/daisuke/mac/doctor.sh
+あとは手作業 3 つ:
   1) Google Drive を起動 → サインイン → デスクトップを「ミラーリング」
   2) claude と打ってログイン（スキル 47 本と MCP は自動）
   3) Claude Desktop / Chrome の Claude 拡張にログイン
