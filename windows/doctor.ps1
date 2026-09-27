@@ -80,11 +80,18 @@ $epicOk = (@($epicPaths | Where-Object { Test-Path $_ }).Count -gt 0) -or ($null
 Add-Row 'creative' 'Epic Games Launcher' $epicOk '' 'winget install EpicGames.EpicGamesLauncher'
 $ue = Get-ChildItem "$env:ProgramFiles\Epic Games" -Directory -Filter 'UE_*' -ErrorAction SilentlyContinue | Select-Object -First 1
 Add-Row 'creative' 'Unreal Engine' ($null -ne $ue) $(if ($ue) { $ue.Name } else { '未導入（任意）' }) 'Epic Games Launcher から UE 5.x を導入'
-Add-Row 'creative' 'Claude Desktop (Cowork)' ((Test-Path "$env:LOCALAPPDATA\AnthropicClaude\claude.exe") -or (Test-Path "$env:LOCALAPPDATA\Programs\Claude\Claude.exe")) '' 'winget install Anthropic.Claude'
-foreach ($k in @('OPENAI_API_KEY', 'GOOGLE_API_KEY')) {
-    $val = [Environment]::GetEnvironmentVariable($k, 'User')
-    Add-Row 'secrets' $k (-not [string]::IsNullOrWhiteSpace($val)) $(if ($val) { "$($val.Length) 文字" } else { '未設定（画像生成に必要）' }) '.\04_secrets.ps1'
-}
+# 実機では exe の置き場が版で変わるので、起動中プロセス / スタートメニュー / アンインストール登録のどれかで判定
+$claudeDesktopOk = ($null -ne (Get-Process -Name 'Claude' -ErrorAction SilentlyContinue)) -or
+    (Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Claude.lnk") -or
+    (Test-Path "$env:LOCALAPPDATA\AnthropicClaude\claude.exe") -or
+    ($null -ne (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue |
+        Where-Object { $_.PSObject.Properties['DisplayName'] -and $_.DisplayName -like 'Claude*' } | Select-Object -First 1))
+Add-Row 'creative' 'Claude Desktop (Cowork)' $claudeDesktopOk '' 'winget install Anthropic.Claude'
+# 画像生成は Gemini キー 1 本で動く（bolero-senden の仕様）。OpenAI は任意
+$gem = [Environment]::GetEnvironmentVariable('GEMINI_API_KEY', 'User')
+Add-Row 'secrets' 'GEMINI_API_KEY' (-not [string]::IsNullOrWhiteSpace($gem)) $(if ($gem) { "$($gem.Length) 文字" } else { '未設定（画像生成に必要）' }) '.\04_secrets.ps1'
+$oai = [Environment]::GetEnvironmentVariable('OPENAI_API_KEY', 'User')
+Add-Row 'secrets' 'OPENAI_API_KEY (任意)' $true $(if ($oai) { "$($oai.Length) 文字" } else { '未設定（Gemini があれば不要）' }) ''
 Add-Row 'creative' 'DaVinci Resolve' (Test-Path "$env:ProgramFiles\Blackmagic Design\DaVinci Resolve\Resolve.exe") '' '任意: blackmagicdesign.com から'
 
 # ---------------------------------------------------------------- fonts
