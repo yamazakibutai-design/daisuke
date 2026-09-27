@@ -207,6 +207,13 @@ if (($targets -contains 'core') -and -not $DryRun) {
 
     $claudeExe = Join-Path $env:USERPROFILE '.local\bin\claude.exe'
     if ((Test-Path $claudeExe) -or (Get-Command claude -ErrorAction SilentlyContinue)) {
+        # インストーラーは PATH を触らないので、ユーザー PATH に .local\bin を足す（実機で確認済み）
+        $binDir = Join-Path $env:USERPROFILE '.local\bin'
+        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+        if (($userPath -split ';') -notcontains $binDir) {
+            [Environment]::SetEnvironmentVariable('Path', "$userPath;$binDir", 'User')
+            Write-Ok "ユーザー PATH に $binDir を追加"
+        }
         Write-Ok 'claude コマンド導入完了（新しいターミナルで claude --version）'
         $script:Installed.Add('Claude Code CLI')
     } else {
