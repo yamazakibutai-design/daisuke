@@ -151,6 +151,19 @@ if (Test-Path $dst) {
     Write-Ok "$dst を作成"
 }
 
+# ---------------------------------------------------------------- 7. セットアップメモを配る
+
+Write-Step 'セットアップメモ（SETUP_*.md）を C:\YBJ と Drive の _from_windows に配置'
+$memo = Get-ChildItem (Join-Path $here 'SETUP_*.md') -ErrorAction SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1
+if ($memo) {
+    Copy-Item $memo.FullName (Join-Path $YbjHome 'README.md') -Force
+    Write-Ok "$YbjHome\README.md  ← $($memo.Name)"
+    if ($SharedRoot -and (Test-Path (Join-Path $SharedRoot '_from_windows'))) {
+        Copy-Item $memo.FullName (Join-Path $SharedRoot "_from_windows\$($memo.Name)") -Force
+        Write-Ok "$SharedRoot\_from_windows\$($memo.Name)（Mac の Obsidian から読める）"
+    }
+}
+
 Write-Host @'
 
 次: ターミナルを開き直してから .\doctor.ps1 で検証。
