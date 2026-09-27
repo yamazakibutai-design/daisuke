@@ -79,6 +79,11 @@ $epicOk = ($epicPaths | Where-Object { Test-Path $_ }).Count -gt 0 -or ($null -n
 Add-Row 'creative' 'Epic Games Launcher' $epicOk '' 'winget install EpicGames.EpicGamesLauncher'
 $ue = Get-ChildItem "$env:ProgramFiles\Epic Games" -Directory -Filter 'UE_*' -ErrorAction SilentlyContinue | Select-Object -First 1
 Add-Row 'creative' 'Unreal Engine' ($null -ne $ue) $(if ($ue) { $ue.Name } else { '未導入（任意）' }) 'Epic Games Launcher から UE 5.x を導入'
+Add-Row 'creative' 'Claude Desktop (Cowork)' ((Test-Path "$env:LOCALAPPDATA\AnthropicClaude\claude.exe") -or (Test-Path "$env:LOCALAPPDATA\Programs\Claude\Claude.exe")) '' 'winget install Anthropic.Claude'
+foreach ($k in @('OPENAI_API_KEY', 'GOOGLE_API_KEY')) {
+    $val = [Environment]::GetEnvironmentVariable($k, 'User')
+    Add-Row 'secrets' $k (-not [string]::IsNullOrWhiteSpace($val)) $(if ($val) { "$($val.Length) 文字" } else { '未設定（画像生成に必要）' }) '.\04_secrets.ps1'
+}
 Add-Row 'creative' 'DaVinci Resolve' (Test-Path "$env:ProgramFiles\Blackmagic Design\DaVinci Resolve\Resolve.exe") '' '任意: blackmagicdesign.com から'
 
 # ---------------------------------------------------------------- fonts

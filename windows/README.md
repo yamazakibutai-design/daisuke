@@ -9,6 +9,7 @@ windows/
 ├─ 01_python.ps1        venv 2 系統（汎用 3.13 / bpy 用 3.11）
 ├─ 02_fonts.ps1         Noto Sans CJK（ユーザー単位）＋ matplotlibrc ＋ ffmpeg 用フォントパス
 ├─ 03_workspace.ps1     C:\YBJ 作業フォルダ・環境変数・git/PowerShell の UTF-8 化・CLAUDE.md 配置
+├─ 04_secrets.ps1       API キー（OpenAI / Google 等）をユーザー環境変数に登録（対話式・値を残さない）
 ├─ doctor.ps1           全部入ったか検証（GPU / NVENC の有無も出す）
 ├─ CLAUDE.windows.md    Windows 機の Claude Code ルール（03 が ~/.claude/CLAUDE.md に配置）
 ├─ requirements-general.txt / requirements-bpy311.txt
@@ -71,7 +72,10 @@ cd "$env:USERPROFILE\daisuke\windows"
 | **Blender** | 一度起動して 4.2 LTS であることを確認（bpy と版を揃える） |
 | **Epic Games Launcher** | サインイン → Unreal Engine 5.x を導入（40GB 級。必要になってから） |
 | **DaVinci Resolve**（任意） | blackmagicdesign.com から。Studio 版なら MCP 連携がある（riha-douga-telop 参照） |
-| **画像生成 API**（任意） | butai-perspective / bolero-senden 用。`OPENAI_API_KEY` / `GOOGLE_API_KEY` をユーザー環境変数に |
+| **画像生成 API** | `.\04_secrets.ps1` で `OPENAI_API_KEY` / `GOOGLE_API_KEY` を登録（Mac の ~/.zshrc から値を確認） |
+| **Claude Desktop（Cowork）** | 起動 → 同じアカウントでログイン。DaVinci の MCP は「Setup AI Assistants」で Claude Desktop を有効化 |
+| **Claude in Chrome** | https://claude.ai/chrome から拡張を入れる → Chrome 右上の Claude アイコンでログイン |
+| **MCP の確認** | Claude Code で `/mcp`。Mac と同じコネクタ（Gmail / Calendar / Drive）が並べば OK。無ければ `claude mcp add` で追加 |
 
 ## Mac との役割分担（決めごと）
 

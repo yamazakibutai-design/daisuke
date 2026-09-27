@@ -152,6 +152,8 @@ $catalog = [ordered]@{
            Note = 'Google Drive 上の MD 保管庫を開く' }
         @{ Name = 'Epic Games Launcher'; Id = @('EpicGames.EpicGamesLauncher')
            Note = 'Unreal Engine を入れる窓口（FBX の受け先）' }
+        @{ Name = 'Claude Desktop';      Id = @('Anthropic.Claude')
+           Note = 'Cowork 用。DaVinci Resolve の MCP 連携はこちら（CLI とは別）' }
     )
     audio = @(
         @{ Name = 'REAPER';             Id = @('Cockos.REAPER')
