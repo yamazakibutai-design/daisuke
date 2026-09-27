@@ -1,0 +1,7 @@
+# bpy 専用 venv（Python 3.11 固定）
+# Blender 4.2 LTS は CPython 3.11 系。bpy==4.2.0 の wheel はその ABI 向けにしか出ていない。
+# ローカルの Blender アプリで開ける互換性を優先して 4.2 に固定する（zumen-3d-previz の方針）。
+bpy==4.2.0
+numpy
+pymupdf
+pillow
