@@ -139,7 +139,9 @@ $srcText = $srcText.Replace('{{YBJ_HOME}}', $YbjHome)
 $srcText = $srcText.Replace('{{YBJ_SHARED}}', $(if ($SharedRoot) { $SharedRoot } else { 'G:\マイドライブ（未検出・要設定）' }))
 if (Test-Path $dst) {
     if ((Get-Content $dst -Raw -Encoding UTF8) -match 'YBJ Windows 機ルール') {
-        Write-Ok "$dst は配置済み（更新したい場合は手で差し替え）"
+        # 自分が置いたものなら最新版で上書き（ルール追記を反映させるため）
+        Set-Content -Path $dst -Value $srcText -Encoding UTF8
+        Write-Ok "$dst を最新版で更新"
     } else {
         Add-Content -Path $dst -Value "`n`n$srcText" -Encoding UTF8
         Write-Ok "$dst の末尾に追記"
