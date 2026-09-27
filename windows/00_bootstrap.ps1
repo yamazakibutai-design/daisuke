@@ -142,7 +142,7 @@ $catalog = [ordered]@{
     creative = @(
         @{ Name = 'Blender';            Id = @('BlenderFoundation.Blender')
            Note = 'zumen-3d-previz の .blend を目視確認する用' }
-        @{ Name = 'ffmpeg';             Id = @('Gyan.FFmpeg.Full', 'Gyan.FFmpeg', 'BtbN.FFmpeg.GPL')
+        @{ Name = 'ffmpeg';             Id = @('Gyan.FFmpeg', 'BtbN.FFmpeg.GPL')
            Note = 'リハ映像テロップの本体。NVENC/QSV 入りビルドが必要' }
         @{ Name = 'Google Chrome';      Id = @('Google.Chrome')
            Note = '画像生成の半自動操作・Gmail 下書き確認' }

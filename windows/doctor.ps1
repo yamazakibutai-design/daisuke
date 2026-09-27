@@ -53,7 +53,7 @@ foreach ($v in @(
 }
 
 # ---------------------------------------------------------------- creative
-$ff = Test-Cmd 'creative' 'ffmpeg' 'ffmpeg' -VersionArgs @('-version') -Fix 'winget install Gyan.FFmpeg.Full'
+$ff = Test-Cmd 'creative' 'ffmpeg' 'ffmpeg' -VersionArgs @('-version') -Fix 'winget install Gyan.FFmpeg'
 if ($ff) {
     $enc = (& ffmpeg -hide_banner -encoders 2>&1) -join "`n"
     foreach ($e in @('h264_nvenc', 'hevc_nvenc', 'h264_qsv', 'h264_amf')) {

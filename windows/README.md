@@ -104,7 +104,7 @@ cd "$env:USERPROFILE\daisuke\windows"
 | 日本語が化ける（PowerShell） | PowerShell 7（`pwsh`）を使う。5.1 は `03_workspace.ps1` のプロファイルで UTF-8 化してある |
 | `python` が Microsoft Store を開く | 設定 > アプリ > アプリ実行エイリアス で python.exe / python3.exe を OFF。venv のフルパスで呼べば無関係 |
 | `bpy` が入らない | `01_python.ps1 -Recreate`。それでもだめなら `blender.exe -b --python` で回す（`notes/previz-windows.md`） |
-| ffmpeg に `h264_nvenc` が無い | `winget install Gyan.FFmpeg.Full`（Essentials 版には無い）。NVIDIA ドライバも更新 |
+| ffmpeg に `h264_nvenc` が無い | `winget install Gyan.FFmpeg`（Essentials 版には無い）。NVIDIA ドライバも更新 |
 | winget の ID が見つからない | `winget search <名前>` で現在の ID を調べ、`00_bootstrap.ps1` の候補リストに足す |
 | Drive が G: に出ない | Drive の設定 > マイドライブの同期オプション > ストリーミング。レターは設定で変えられる |
 | `Operation not permitted` で消せない | それは Mac の VM の話。Windows では普通に消せる（`_中間ファイル_削除可` を確認してから） |
